@@ -4,8 +4,8 @@ import pygame
 
 SCREEN_WIDTH=800
 SCREEN_HEIGHT=500
-PLAYER_START_X=170
-PLAYER_START_Y=180
+PLAYER_START_X=370
+PLAYER_START_Y=380
 ENEMY_START_Y_MIN=50
 ENEMY_START_Y_MAX=150
 ENEMY_SPEED_X=4
@@ -43,7 +43,7 @@ bulletY=PLAYER_START_Y
 bullet_state="ready"
 score=0
 font=pygame.font.Font("freesansbold.ttf",32)
-game_over=font=pygame.font.Font("freesansbold.ttf",64)
+game_over=pygame.font.Font("freesansbold.ttf",64)
 running=True
 while running:
     screen.blit(background,(0,0))
@@ -73,7 +73,7 @@ while running:
         if enemyX[i] <= 0 or enemyX[i] >= SCREEN_WIDTH-ENEMY_SIZE:
             enemyX_change[i] *= -1
             enemyY[i] += ENEMY_SPEED_Y
-        if math.hypot(enemyX[i]- bulletX,enemyY[i]-bulletY< COLLISION_DISTANCE):
+        if math.hypot(enemyX[i]- bulletX,enemyY[i]-bulletY)< COLLISION_DISTANCE:
             score += 1
             bulletY =PLAYER_START_Y
             bullet_state ="ready" 
@@ -84,7 +84,7 @@ while running:
             running=False
         screen.blit(enemyImg[i],(enemyX[i],enemyY[i]))
     screen.blit(playerimg,(playerX,playerY))
-    screen.blit(font.render(f"Score:(score)",True,(255,255,255)),(10,10))
+    screen.blit(font.render(f"Score:{score}",True,(255,255,255)),(10,10))
     pygame.display.update()
     clock.tick(60)
 pygame.quit()
