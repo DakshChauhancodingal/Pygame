@@ -1,3 +1,4 @@
+import array
 import math
 import random
 import pygame
@@ -13,7 +14,30 @@ ENEMY_SPEED_Y=40
 BULLET_SPEED_Y=10
 COLLISION_DISTANCE=27
 
+
+def create_sound(start_frequency, end_frequency, duration, volume):
+    sample_rate = 44100
+    sample_count = int(sample_rate * duration)
+    samples = array.array("h")
+    for sample_index in range(sample_count):
+        progress = sample_index / sample_count
+        phase = 2 * math.pi * duration * (
+            start_frequency * progress
+            + (end_frequency - start_frequency) * progress ** 2 / 2
+        )
+        envelope = 1 - progress
+        samples.append(int(32767 * volume * envelope * math.sin(phase)))
+    return pygame.mixer.Sound(buffer=samples)
+
+pygame.mixer.pre_init(44100, -16, 1)
 pygame.init()
+if pygame.mixer.get_init():
+    shoot_sound = create_sound(900, 250, 0.12, 0.35)
+    hit_sound = create_sound(550, 120, 0.2, 0.4)
+else:
+    print("Audio is unavailable; continuing without sound.")
+    shoot_sound = None
+    hit_sound = None
 clock=pygame.time.Clock()
 screen=pygame.display.set_mode((SCREEN_WIDTH,
 SCREEN_HEIGHT))
@@ -58,6 +82,8 @@ while running:
             elif event.key == pygame.K_SPACE and bullet_state =="ready":
                 bulletX=playerX
                 bullet_state="fire"
+                if shoot_sound:
+                    shoot_sound.play()
         elif event.type ==pygame.KEYUP:
              playerX_change=0
     playerX += playerX_change
@@ -75,6 +101,8 @@ while running:
             enemyY[i] += ENEMY_SPEED_Y
         if math.hypot(enemyX[i]- bulletX,enemyY[i]-bulletY)< COLLISION_DISTANCE:
             score += 1
+            if hit_sound:
+                hit_sound.play()
             bulletY =PLAYER_START_Y
             bullet_state ="ready" 
             enemyX[i] = random.randint(0,SCREEN_WIDTH-ENEMY_SIZE)
